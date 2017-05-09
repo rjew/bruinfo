@@ -17,6 +17,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+    }
 }
 
 dependencies {
@@ -24,7 +27,17 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+
+    compile group: 'com.pubnub', name: 'pubnub', version: '4.2.3'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.7.3'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.7.3'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.7.3'
+    compile group: 'com.google.guava', name: 'guava', version: '20.0'
+    compile group: 'joda-time', name: 'joda-time', version: '2.9.7'
+    compile 'com.android.support:mediarouter-v7:25.3.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.google.android.gms:play-services-maps:10.2.4'
+    compile 'com.google.android.gms:play-services-location:10.2.4'
     testCompile 'junit:junit:4.12'
 }
