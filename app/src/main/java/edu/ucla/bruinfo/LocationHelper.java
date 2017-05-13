@@ -18,6 +18,10 @@ public class LocationHelper implements GoogleApiClient.ConnectionCallbacks, Goog
     private GoogleApiClient mGoogleApiClient;
     private LocationListener mLocationListener;
 
+    private final long LONG_INTERVAL = 5000; // 5 seconds
+    private final long SHORT_INTERVAL = 1000; // 1 second
+    private final float SMALLEST_DISPLACEMENT = 5; // 5 meters
+
     public LocationHelper(Context context, LocationListener mLocationListener) {
         this.mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addConnectionCallbacks(this)
@@ -51,7 +55,11 @@ public class LocationHelper implements GoogleApiClient.ConnectionCallbacks, Goog
             Log.v("locationDenied", e.getMessage());
         }
         try {
-            LocationRequest locationRequest = LocationRequest.create().setInterval(5000);
+            LocationRequest locationRequest = LocationRequest.create()
+                                                             .setInterval(LONG_INTERVAL)
+                                                             .setFastestInterval(SHORT_INTERVAL)
+                                                             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                                                             .setSmallestDisplacement(SMALLEST_DISPLACEMENT);
 
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, locationRequest, this);
         } catch (SecurityException e) {

@@ -14,10 +14,12 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     public static final String TAG = MainActivity.class.getName();
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
-                Toast.makeText(this, "Please grant permission to access location!", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Enable location services for accurate data", Toast.LENGTH_LONG).show();
                 goToSettings();
             } else {
 
@@ -115,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    Toast.makeText(this, "Please grant permission to access location!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Enable location services for accurate data", Toast.LENGTH_LONG).show();
                     goToSettings();
                 }
             }
@@ -139,10 +141,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.i(TAG, String.valueOf(newLocation.getLatitude()));
                 Log.i(TAG, String.valueOf(newLocation.getLongitude()));
 
-                //mMap.moveCamera(CameraUpdateFactory.newLatLng(newLocation));
-                //LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                //CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
-                //mMap.animateCamera(cameraUpdate);
+                LatLng latLng = new LatLng(newLocation.getLatitude(), newLocation.getLongitude());
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
+                mMap.animateCamera(cameraUpdate);
             }
         };
     }
