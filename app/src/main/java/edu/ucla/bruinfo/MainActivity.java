@@ -21,10 +21,24 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+import java.nio.charset.Charset;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     public static final String TAG = MainActivity.class.getName();
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2017;
     private static final int REQUEST_APP_SETTINGS = 168;
+    private static final String GOOGLE_PLACES_API_KEY = "AIzaSyDCtM8cDa6Gj_I0jUG4dh8fihRRqmi0jHo";
+    private final String RADIUS = "75"; //meters
 
     private GoogleMap mMap;
 
@@ -144,8 +158,63 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 LatLng latLng = new LatLng(newLocation.getLatitude(), newLocation.getLongitude());
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
                 mMap.animateCamera(cameraUpdate);
+
+                JSONObject json = readJsonFromUrl(generateURL(newLocation));
+
+                try {
+                    JSONArray locationResults = json.getJSONArray("results");
+
+                    for (int i = 0; i < locationResults.length(); i++) {
+                        String locationName = locationResults.getJSONObject(i).getString("name");
+                        Log.i(TAG, locationName);
+                    }
+                } catch (JSONException ex) {
+                    Log.e(TAG, "\nERROR in onLocationChanged - JSONException: " + ex.toString());
+                    System.exit(1);
+                }
             }
         };
+    }
+
+    private String generateURL(Location location) {
+        String URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
+                + "location="
+                + String.valueOf(location.getLatitude())
+                + "," + String.valueOf(location.getLongitude())
+                + "&radius="
+                + RADIUS
+                + "&key="
+                + GOOGLE_PLACES_API_KEY;
+
+        return URL.replace(" ", "%20");
+    }
+
+    private String readAll(Reader rd) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int cp;
+        while ((cp = rd.read()) != -1) {
+            sb.append((char) cp);
+        }
+        return sb.toString();
+    }
+
+    private JSONObject readJsonFromUrl(String url) {
+        try (InputStream is = new URL(url).openStream()) {
+            try (BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")))) {
+                String jsonText = readAll(rd);
+                return new JSONObject(jsonText);
+            } catch (JSONException ex) {
+                Log.e(TAG, "\nERROR in readJsonFromUrl - JSONException: " + ex.toString());
+                System.exit(1);
+            } finally {
+                is.close();
+            }
+        } catch (IOException ex) {
+            Log.e(TAG, "\nERROR in readJsonFromUrl - IOException: " + ex.toString());
+            System.exit(1);
+        }
+
+        return new JSONObject();
     }
 }
 
