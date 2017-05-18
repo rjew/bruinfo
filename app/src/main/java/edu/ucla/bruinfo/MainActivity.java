@@ -5,6 +5,9 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.jsoup.Jsoup;
@@ -13,18 +16,34 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    private ListView mInfoListView;
+    private InfoListViewAdapter mInfoListViewAdapter;
+    private List<InfoListItem> mInfoListItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.info_list_view);
 
+        mInfoListView = (ListView) findViewById(R.id.infoListView);
+
+        mInfoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.v("LINK", "Hello from " + position);
+            }
+        });
         String googleSearchURL = "https://google.com/search?q=Royce+Hall";
 
         Log.d("URL: ", googleSearchURL);
+        mInfoListItems = new ArrayList<InfoListItem>();
         new ParseGoogleSearch(googleSearchURL).execute();
+
     }
 
     // ParseGoogleSearch AsyncTask
@@ -42,11 +61,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-//            mProgressDialog = new ProgressDialog(MainActivity.this);
-//            mProgressDialogg.setTitle("Android Basic JSoup Tutorial");
-//            mProgressDialog.setMessage("Loading...");
-//            mProgressDialog.setIndeterminate(false);
-//            mProgressDialog.show();
         }
 
         @Override
@@ -68,18 +82,24 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result) {
             // Retrieve URL links and descriptions of Google search results
+            // Add an infoListItem for each text/URL combo
             for (int i = 0; i < this.numSearchResultLinks; i++) {
                 Element searchResultLink = this.searchResultLinks.get(i);
-                String linkHref = searchResultLink.attr("href");
+                String linkURL = searchResultLink.attr("href");
                 String linkText = searchResultLink.text();
 
-                Log.v("linkHref: ", linkHref);
-                Log.v("linkText: ", linkText);
+
+                InfoListItem infoListItem = new InfoListItem(linkText, linkURL);
+                mInfoListItems.add(infoListItem);
             }
-            // Set title into TextView
-           // TextViewTextViewTextView txttitle = (TextView) findViewById(R.id.titletxt);
-//            txttitle.setText(title);
-//            mProgressDialog.dismiss();
+
+            // Set the infoListViewAdapter with all the infoListViewItems
+            mInfoListViewAdapter = new InfoListViewAdapter(getApplicationContext(),
+                    R.layout.info_list_item, mInfoListItems);
+
+            if (mInfoListView != null) {
+                mInfoListView.setAdapter(mInfoListViewAdapter);
+            }
         }
     }
 }
