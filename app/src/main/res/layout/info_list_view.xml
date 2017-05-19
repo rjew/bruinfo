@@ -6,10 +6,10 @@
     android:orientation="vertical"
     android:weightSum="20">
     <TextView
-        android:text="Bruinfo about Places around You:"
+        android:text="bruinfo near you..."
         android:textSize="30dp"
-        android:background="#eee"
-        android:textColor="#555"
+        android:background="#46494C"
+        android:textColor="#DCDCDD"
         android:gravity="center_horizontal|center_vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -19,6 +19,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="15"
+        android:divider="#46494C"
+        android:dividerHeight="2dp"
         android:id="@+id/infoListView" />
 
 </LinearLayout>

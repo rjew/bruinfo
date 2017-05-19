@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                 String linkText = searchResultLink.text();
 
 
-                InfoListItem infoListItem = new InfoListItem(linkText, linkURL);
+                InfoListItem infoListItem = new InfoListItem(linkText, linkURL, "");
                 mInfoListItems.add(infoListItem);
             }
 

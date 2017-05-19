@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -45,12 +46,18 @@ public class InfoListViewAdapter extends ArrayAdapter<InfoListItem> {
 
         // Get a reference to the different view elements we wish to update
         TextView linkTextView = (TextView) infoListItem.findViewById(R.id.linkText);
-        TextView linkURLView = (TextView) infoListItem.findViewById(R.id.linkHref);
+        TextView linkURLView = (TextView) infoListItem.findViewById(R.id.linkURL);
+        ImageView linkImageView = (ImageView) infoListItem.findViewById(R.id.linkImage);
 
-        // Set the proper link text and URL
+        // Set the proper link text, URL, and image
         InfoListItem infoListItemData = mInfoListItems.get(position);
         linkTextView.setText(infoListItemData.mLinkText);
         linkURLView.setText(infoListItemData.mLinkURL);
+
+        if (infoListItemData.mLinkImage != "") {
+            int resId = mContext.getResources().getIdentifier(infoListItemData.mLinkImage, "mipmap", mContext.getPackageName());
+            linkImageView.setImageResource(resId);
+        }
 
         return infoListItem;
     }

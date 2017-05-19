@@ -7,9 +7,11 @@ package edu.ucla.bruinfo;
 public class InfoListItem {
     public String mLinkText;
     public String mLinkURL;
+    public String mLinkImage;
 
-    public InfoListItem(String mLinkText, String mLinkURL) {
+    public InfoListItem(String mLinkText, String mLinkURL, String mLinkImage) {
         this.mLinkText = mLinkText;
         this.mLinkURL = mLinkURL;
+        this.mLinkImage = mLinkImage;
     }
 }

@@ -2,24 +2,41 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#111">
+    android:background="#DCDCDD">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/linkImage"
+        android:src="@mipmap/ic_launcher_round"
+        android:padding="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#eee"
+        android:textColor="#4C5C69"
         android:text="Link Text"
+        android:maxLines="1"
         android:id="@+id/linkText"
-        android:padding="15dp"/>
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/linkImage"
+        android:paddingLeft="10dp"
+        android:layout_marginTop="15dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#cee5ff"
+        android:textColor="#1985A1"
         android:text="Link URL"
-        android:padding="15dp"
-        android:id="@+id/linkHref"
-        android:layout_below="@+id/linkText"/>
+        android:maxLines="1"
+        android:paddingLeft="10dp"
+        android:id="@+id/linkURL"
+        android:layout_below="@+id/linkText"
+        android:layout_toRightOf="@+id/linkImage"
+        />
 
 </RelativeLayout>
