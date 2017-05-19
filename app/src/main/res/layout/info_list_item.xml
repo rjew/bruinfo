@@ -16,6 +16,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#cee5ff"
+        android:text="Link URL"
         android:padding="15dp"
         android:id="@+id/linkHref"
         android:layout_below="@+id/linkText"/>

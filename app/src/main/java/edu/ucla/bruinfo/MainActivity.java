@@ -1,11 +1,13 @@
 package edu.ucla.bruinfo;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -32,21 +34,27 @@ public class MainActivity extends AppCompatActivity {
 
         mInfoListView = (ListView) findViewById(R.id.infoListView);
 
+        // On click of an infoListItem, open up a WebView to load the corresponding
+        // Google search result link passed to another InfoWebView activity by an intent extra
         mInfoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.v("LINK", "Hello from " + position);
+                String linkURL = mInfoListItems.get(position).mLinkURL;
+                System.out.println("LinkURL: " + linkURL);
+
+                Intent intent = new Intent(getApplicationContext(), InfoWebViewActivity.class);
+                intent.putExtra("linkURL", linkURL);
+                startActivity(intent);
             }
         });
-        String googleSearchURL = "https://google.com/search?q=Royce+Hall";
 
-        Log.d("URL: ", googleSearchURL);
+        String googleSearchURL = "https://google.com/search?q=Royce+Hall";
         mInfoListItems = new ArrayList<InfoListItem>();
         new ParseGoogleSearch(googleSearchURL).execute();
-
     }
 
-    // ParseGoogleSearch AsyncTask
+    // Helper asynchronous class that runs the Jsoup HTML parsing of Google Search Results
+    // given a Google search URL
     private class ParseGoogleSearch extends AsyncTask<Void, Void, Void> {
         String googleSearchURL;
         Elements searchResultLinks;
