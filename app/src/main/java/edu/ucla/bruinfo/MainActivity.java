@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
@@ -159,21 +160,48 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
                 mMap.animateCamera(cameraUpdate);
 
-                JSONObject json = readJsonFromUrl(generateURL(newLocation));
-
-                try {
-                    JSONArray locationResults = json.getJSONArray("results");
-
-                    for (int i = 0; i < locationResults.length(); i++) {
-                        String locationName = locationResults.getJSONObject(i).getString("name");
-                        Log.i(TAG, locationName);
-                    }
-                } catch (JSONException ex) {
-                    Log.e(TAG, "\nERROR in onLocationChanged - JSONException: " + ex.toString());
-                    System.exit(1);
-                }
+                new LocationsGrabber(newLocation).execute();
             }
         };
+    }
+
+    private class LocationsGrabber extends AsyncTask<Void, Void, Void> {
+        private Location location;
+
+        private LocationsGrabber(Location location) {
+            this.location = location;
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            JSONObject json = readJsonFromUrl(generateURL(this.location));
+
+            try {
+                JSONArray locationResults = json.getJSONArray("results");
+
+                for (int i = 0; i < locationResults.length(); i++) {
+                    String locationName = locationResults.getJSONObject(i).getString("name");
+                    Log.i(TAG, locationName);
+
+                    JSONObject location = locationResults.getJSONObject(i).getJSONObject("geometry").getJSONObject("location");
+                    double latitude = location.getDouble("lat");
+                    double longitude = location.getDouble("lng");
+                    Log.i(TAG, Double.toString(latitude));
+                    Log.i(TAG, Double.toString(longitude));
+
+                    //Example of json response
+                    //https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=34.0750228,-118.4418203&radius=75&key=AIzaSyDCtM8cDa6Gj_I0jUG4dh8fihRRqmi0jHo
+
+                    //TODO: Use longitude and latitude of nearby locations and place markers on them
+                    //TODO: filter by points of interest to skip Los Angeles and Westwood locations?
+                }
+            } catch (JSONException ex) {
+                Log.e(TAG, "\nERROR in doInBackground - JSONException: " + ex.toString());
+                System.exit(1);
+            }
+
+            return null;
+        }
     }
 
     private String generateURL(Location location) {
