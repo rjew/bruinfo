@@ -21,6 +21,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -165,11 +167,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         };
     }
 
-    private class LocationsGrabber extends AsyncTask<Void, Void, Void> {
+    private class LocationsGrabber extends AsyncTask<Void, Void, Void> implements
+            GoogleMap.OnMarkerClickListener {
         private Location location;
 
         private LocationsGrabber(Location location) {
             this.location = location;
+        }
+
+        /** Called when the user clicks a marker. */
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+            Log.i(TAG, "Marker clicked!");
+
+            // Return false to indicate that we have not consumed the event and that we wish
+            // for the default behavior to occur (which is for the camera to move such that the
+            // marker is centered and for the marker's info window to open, if it has one).
+            return false;
         }
 
         @Override
@@ -180,19 +194,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 JSONArray locationResults = json.getJSONArray("results");
 
                 for (int i = 0; i < locationResults.length(); i++) {
-                    String locationName = locationResults.getJSONObject(i).getString("name");
+                    final String locationName = locationResults.getJSONObject(i).getString("name");
                     Log.i(TAG, locationName);
 
+                    final String vicinity = locationResults.getJSONObject(i).getString("vicinity");
+
                     JSONObject location = locationResults.getJSONObject(i).getJSONObject("geometry").getJSONObject("location");
-                    double latitude = location.getDouble("lat");
-                    double longitude = location.getDouble("lng");
+                    final double latitude = location.getDouble("lat");
+                    final double longitude = location.getDouble("lng");
                     Log.i(TAG, Double.toString(latitude));
                     Log.i(TAG, Double.toString(longitude));
+
+                    final LocationsGrabber self = this;
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(latitude, longitude))
+                                    .title(locationName)
+                                    .snippet(vicinity));
+
+                            // Set a listener for marker click.
+                            mMap.setOnMarkerClickListener(self);
+                        }
+                    });
 
                     //Example of json response
                     //https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=34.0750228,-118.4418203&radius=75&key=AIzaSyDCtM8cDa6Gj_I0jUG4dh8fihRRqmi0jHo
 
-                    //TODO: Use longitude and latitude of nearby locations and place markers on them
                     //TODO: filter by points of interest to skip Los Angeles and Westwood locations?
                 }
             } catch (JSONException ex) {
