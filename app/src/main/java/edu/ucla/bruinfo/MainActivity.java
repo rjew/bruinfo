@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int REQUEST_APP_SETTINGS = 168;
     private static final String GOOGLE_PLACES_API_KEY = "AIzaSyDCtM8cDa6Gj_I0jUG4dh8fihRRqmi0jHo";
     private final String RADIUS = "75"; //meters
+    private final String MAX_IMAGE_WIDTH = "400";
 
     private GoogleMap mMap;
 
@@ -188,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            JSONObject json = readJsonFromUrl(generateURL(this.location));
+            JSONObject json = readJsonFromUrl(generateNearbySearchURL(this.location));
 
             try {
                 JSONArray locationResults = json.getJSONArray("results");
@@ -198,6 +199,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Log.i(TAG, locationName);
 
                     final String vicinity = locationResults.getJSONObject(i).getString("vicinity");
+
+                    final String photoReference = locationResults.getJSONObject(i).getJSONArray("photos").getJSONObject(0).getString("photo_reference");
+                    String imageURL = (photoReference == null) ? locationResults.getJSONObject(i).getString("icon") : generatePhotoURL(photoReference);
 
                     JSONObject location = locationResults.getJSONObject(i).getJSONObject("geometry").getJSONObject("location");
                     final double latitude = location.getDouble("lat");
@@ -232,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private String generateURL(Location location) {
+    private String generateNearbySearchURL(Location location) {
         String URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
                 + "location="
                 + String.valueOf(location.getLatitude())
@@ -241,6 +245,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 + RADIUS
                 //+ "type="
                 //+ "point_of_interest"
+                + "&key="
+                + GOOGLE_PLACES_API_KEY;
+
+        return URL.replace(" ", "%20");
+    }
+
+    private String generatePhotoURL(String photoReference) {
+        String URL = "https://maps.googleapis.com/maps/api/place/photo?"
+                + "maxwidth="
+                + MAX_IMAGE_WIDTH
+                + "&photoreference="
+                + photoReference
                 + "&key="
                 + GOOGLE_PLACES_API_KEY;
 
