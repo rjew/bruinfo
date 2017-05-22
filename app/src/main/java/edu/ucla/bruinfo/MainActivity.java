@@ -222,8 +222,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     //Example of json response
                     //https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=34.0750228,-118.4418203&radius=75&key=AIzaSyDCtM8cDa6Gj_I0jUG4dh8fihRRqmi0jHo
-
-                    //TODO: filter by points of interest to skip Los Angeles and Westwood locations?
                 }
             } catch (JSONException ex) {
                 Log.e(TAG, "\nERROR in doInBackground - JSONException: " + ex.toString());
@@ -241,6 +239,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 + "," + String.valueOf(location.getLongitude())
                 + "&radius="
                 + RADIUS
+                //+ "type="
+                //+ "point_of_interest"
                 + "&key="
                 + GOOGLE_PLACES_API_KEY;
 
