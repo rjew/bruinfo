@@ -24,6 +24,7 @@ public class InfoListViewAdapter extends ArrayAdapter<InfoListItem> {
     int mLayoutResourceId;
     List<InfoListItem> mInfoListItems;
 
+
     public InfoListViewAdapter(Context mContext, int mLayoutResourceId, List<InfoListItem> mInfoListItems) {
         super(mContext, mLayoutResourceId, mInfoListItems);
         this.mContext = mContext;
