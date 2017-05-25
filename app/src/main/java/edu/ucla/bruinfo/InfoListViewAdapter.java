@@ -39,27 +39,44 @@ public class InfoListViewAdapter extends ArrayAdapter<InfoListItem> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View infoListItem = convertView;
+        InfoListItemHolder infoListItemHolder = null;
 
-        // Inflate the layout for a single info list item
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        infoListItem = inflater.inflate(mLayoutResourceId, parent, false);
+        // If we currently do not have an infoListItem View to reuse,
+        // create a new infoListItem View
+        if (infoListItem == null) {
+            // Inflate the layout for a single info list item
+            LayoutInflater inflater = LayoutInflater.from(mContext);
+            infoListItem = inflater.inflate(mLayoutResourceId, parent, false);
 
-        // Get a reference to the different view elements we wish to update
-        TextView linkTextView = (TextView) infoListItem.findViewById(R.id.linkText);
-        TextView linkURLView = (TextView) infoListItem.findViewById(R.id.linkURL);
-        ImageView linkImageView = (ImageView) infoListItem.findViewById(R.id.linkImage);
+            // Get a reference to the different view elements we wish to update in our holder
+            infoListItemHolder = new InfoListItemHolder();
+            infoListItemHolder.mLinkTextView = (TextView) infoListItem.findViewById(R.id.linkText);
+            infoListItemHolder.mLinkURLView = (TextView) infoListItem.findViewById(R.id.linkURL);
+            infoListItemHolder.mLinkImageView = (ImageView) infoListItem.findViewById(R.id.linkImage);
+
+            infoListItem.setTag(infoListItemHolder);
+        } else {
+            // Otherwise, use an existing infoListItem View
+            infoListItemHolder = (InfoListItemHolder) infoListItem.getTag();
+        }
 
         // Set the proper link text, URL, and image
         InfoListItem infoListItemData = mInfoListItems.get(position);
-        linkTextView.setText(infoListItemData.mLinkText);
-        linkURLView.setText(infoListItemData.mLinkURL);
+        infoListItemHolder.mLinkTextView.setText(infoListItemData.mLinkText);
+        infoListItemHolder.mLinkURLView.setText(infoListItemData.mLinkURL);
 
         if (infoListItemData.mLinkImage != "") {
             int resId = mContext.getResources().getIdentifier(infoListItemData.mLinkImage, "mipmap", mContext.getPackageName());
-            linkImageView.setImageResource(resId);
+            infoListItemHolder.mLinkImageView.setImageResource(resId);
         }
 
         return infoListItem;
+    }
+
+    private static class InfoListItemHolder {
+        TextView mLinkTextView;
+        TextView mLinkURLView;
+        ImageView mLinkImageView;
     }
 }
 
