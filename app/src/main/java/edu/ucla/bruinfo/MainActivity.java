@@ -200,8 +200,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     final String vicinity = locationResults.getJSONObject(i).getString("vicinity");
 
-                    final String photoReference = locationResults.getJSONObject(i).getJSONArray("photos").getJSONObject(0).getString("photo_reference");
-                    String imageURL = (photoReference == null) ? locationResults.getJSONObject(i).getString("icon") : generatePhotoURL(photoReference);
+                    JSONArray photosJSONArray = locationResults.getJSONObject(i).optJSONArray("photos");
+                    String photoReference = (photosJSONArray == null) ? "" : photosJSONArray.getJSONObject(0).getString("photo_reference");
+                    String imageURL = (photoReference.isEmpty()) ? locationResults.getJSONObject(i).getString("icon") : generatePhotoURL(photoReference);
 
                     JSONObject location = locationResults.getJSONObject(i).getJSONObject("geometry").getJSONObject("location");
                     final double latitude = location.getDouble("lat");
