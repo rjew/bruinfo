@@ -4,6 +4,8 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
+    <!--TODO: Add Google Maps Fragment-->
+
     <fragment
         android:name="edu.ucla.bruinfo.InfoListViewFragment"
         android:id="@+id/infoListViewFragment"

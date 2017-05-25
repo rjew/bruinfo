@@ -1,23 +1,9 @@
 package edu.ucla.bruinfo;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.AsyncTask;
+
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends FragmentActivity {
 
@@ -27,6 +13,10 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
+            // TODO: load Google Maps Fragment
+
+            // Load InfoListViewFragment
+            // TODO: pass in Google Places into the InfoListView
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.infoListViewFragment, new InfoListViewFragment())
                     .commit();

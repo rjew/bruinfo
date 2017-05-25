@@ -4,7 +4,6 @@ package edu.ucla.bruinfo;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,28 +62,6 @@ public class InfoListViewFragment extends Fragment {
 
         return mainView;
     }
-
-//    @Override
-//    public void onActivityCreated(Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-//
-//        mInfoListView = (ListView) getActivity().findViewById(R.id.infoListView);
-//
-//        // On click of an infoListItem, open up a WebView to load the corresponding
-//        // Google search result link passed to another InfoWebView activity by an intent extra
-//        mInfoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                String linkURL = mInfoListItems.get(position).mLinkURL;
-//
-//                Intent intent = new Intent(getActivity().getApplicationContext(), InfoWebViewActivity.class);
-//                intent.putExtra("linkURL", linkURL);
-//                startActivity(intent);
-//            }
-////        });
-//
-//
-//    }
 
     // Helper asynchronous class that runs the Jsoup HTML parsing of Google Search Results
     // given a Google search URL
