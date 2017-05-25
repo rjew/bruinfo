@@ -35,6 +35,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.List;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     public static final String TAG = MainActivity.class.getName();
@@ -190,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         protected Void doInBackground(Void... arg0) {
             JSONObject json = readJsonFromUrl(generateNearbySearchURL(this.location));
+            List<String> locationSearchURLs = new ArrayList<>();
 
             try {
                 JSONArray locationResults = json.getJSONArray("results");
@@ -197,6 +200,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 for (int i = 0; i < locationResults.length(); i++) {
                     final String locationName = locationResults.getJSONObject(i).getString("name");
                     Log.i(TAG, locationName);
+
+                    locationSearchURLs.add(generateSearchQueryURL(locationName));
+                    Log.i(TAG, locationSearchURLs.get(locationSearchURLs.size() - 1));
 
                     final String vicinity = locationResults.getJSONObject(i).getString("vicinity");
 
@@ -262,6 +268,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 + GOOGLE_PLACES_API_KEY;
 
         return URL.replace(" ", "%20");
+    }
+
+    private String generateSearchQueryURL(String locationName) {
+        String URL = "https://www.google.com/search?q=" + locationName;
+
+        return URL.replace(" ", "+");
     }
 
     private String readAll(Reader rd) throws IOException {
