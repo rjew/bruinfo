@@ -11,6 +11,7 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -38,7 +39,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity, FragmentActivity implements OnMapReadyCallback {
     public static final String TAG = MainActivity.class.getName();
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2017;
     private static final int REQUEST_APP_SETTINGS = 168;
@@ -55,12 +56,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+      
+        if (savedInstanceState == null) {
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+            mapFragment.getMapAsync(this);
 
-        this.mLocationHelper = new LocationHelper(this, getLocationListener());
+            this.mLocationHelper = new LocationHelper(this, getLocationListener());
+
+            // Load InfoListViewFragment
+            // TODO: pass in Google Places into the InfoListView
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.infoListViewFragment, new InfoListViewFragment())
+                    .commit();
+        }
     }
 
     @Override
@@ -304,4 +313,3 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return new JSONObject();
     }
 }
-
