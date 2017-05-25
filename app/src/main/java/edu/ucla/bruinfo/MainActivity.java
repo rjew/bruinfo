@@ -244,8 +244,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 + "," + String.valueOf(location.getLongitude())
                 + "&radius="
                 + RADIUS
-                //+ "type="
-                //+ "point_of_interest"
+                + "&type="
+                + "point_of_interest"
                 + "&key="
                 + GOOGLE_PLACES_API_KEY;
 
