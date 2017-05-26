@@ -17,7 +17,7 @@ import android.webkit.WebResourceRequest;
 public class MainActivity extends AppCompatActivity {
     WebView mWebview;
     WebSettings mWebSettings;
-    TextView beginLoading,endLoading,loading,mtitle;
+    TextView beginLoading, endLoading, loading, mtitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,15 +37,16 @@ public class MainActivity extends AppCompatActivity {
 
 
 // load inside of webview
-        //mWebview.setWebViewClient(new WebViewClient() {
-           // @Override
-            //public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-          //      view.loadUrl("http://www.google.com/");
-            //    return true;
-       //     }
-       // });
+        mWebview.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                view.loadUrl(request.getUrl().toString());
+                return true;
+            }
+        });
+
+    }
 
 
 
-}
 }
