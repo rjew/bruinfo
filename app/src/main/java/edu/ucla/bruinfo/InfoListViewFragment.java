@@ -19,6 +19,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by Alfred Lucero on 5/25/2017.
@@ -39,6 +40,7 @@ public class InfoListViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View mainView = inflater.inflate(R.layout.fragment_info_list_view, container, false);
 
+        mInfoListItems = new ArrayList<InfoListItem>();
         mInfoListView = (ListView) mainView.findViewById(R.id.infoListView);
 
         // On click of an infoListItem, open up a WebView to load the corresponding
@@ -54,69 +56,101 @@ public class InfoListViewFragment extends Fragment {
             }
         });
 
-        // Parse Google search results based on places around the user
-        // and fill the InfoListView with related links
-        String googleSearchURL = "https://google.com/search?q=Royce+Hall";
-        mInfoListItems = new ArrayList<InfoListItem>();
-        new ParseGoogleSearch(googleSearchURL).execute();
+        ArrayList<String> googleSearchURLs = new ArrayList<String>();
+        googleSearchURLs.add("https://www.google.com/search?q=Royce+Hall");
+        googleSearchURLs.add("https://www.google.com/search?q=Powell+Libary");
+        updateInfoListView(googleSearchURLs);
 
         return mainView;
     }
 
-    // Helper asynchronous class that runs the Jsoup HTML parsing of Google Search Results
-    // given a Google search URL
-    private class ParseGoogleSearch extends AsyncTask<Void, Void, Void> {
-        String googleSearchURL;
-        Elements searchResultLinks;
-        int numSearchResultLinks;
+    public void updateInfoListView(ArrayList<String> googleSearchURLs) {
+        new ParseGoogleSearches(googleSearchURLs);
+    }
 
-        public ParseGoogleSearch(String googleSearchURL) {
-            this.googleSearchURL = googleSearchURL;
-            this.numSearchResultLinks = 0;
-            this.searchResultLinks = null;
+    private class ParseGoogleSearches {
+        private int mNumSearchQueries;
+        private int mNumSearchQueriesFinished;
+
+        public ParseGoogleSearches(ArrayList<String> googleSearchURLs) {
+            this.mNumSearchQueries = googleSearchURLs.size();
+            this.mNumSearchQueriesFinished = 0;
+
+            // Clear the old InfoListItems
+            mInfoListItems.clear();
+
+            for (int i = 0; i < this.mNumSearchQueries; i++) {
+                String googleSearchURL = googleSearchURLs.get(i);
+                new ParseGoogleSearch(googleSearchURL).execute();
+            }
         }
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
+        // Helper asynchronous class that runs the Jsoup HTML parsing of Google Search Results
+        // given a Google search URL
+        private class ParseGoogleSearch extends AsyncTask<Void, Void, Void> {
+            private String mGoogleSearchURL;
+            private Elements mSearchResultLinks;
+            private int mNumSearchResultLinks;
 
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                // Retrieve Google search results HTML document to be parsed
-                Document doc = Jsoup.connect(googleSearchURL).get();
 
-                // Parse out the search result links to populate info ListView
-                this.searchResultLinks = doc.select("h3.r > a");
-                this.numSearchResultLinks = this.searchResultLinks.size();
-            } catch (IOException e) {
-                e.printStackTrace();
+            public ParseGoogleSearch(String googleSearchURL) {
+                this.mGoogleSearchURL = googleSearchURL;
+                this.mNumSearchResultLinks = 0;
+                this.mSearchResultLinks = null;
             }
 
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            // Retrieve URL links and descriptions of Google search results
-            // Add an infoListItem for each text/URL combo
-            for (int i = 0; i < this.numSearchResultLinks; i++) {
-                Element searchResultLink = this.searchResultLinks.get(i);
-                String linkURL = searchResultLink.attr("href");
-                String linkText = searchResultLink.text();
-
-
-                InfoListItem infoListItem = new InfoListItem(linkText, linkURL, "");
-                mInfoListItems.add(infoListItem);
+            public void setGoogleSearchURL(String googleSearchURL) {
+                this.mGoogleSearchURL = googleSearchURL;
             }
 
-            // Set the infoListViewAdapter with all the infoListViewItems
-            mInfoListViewAdapter = new InfoListViewAdapter(getActivity().getApplicationContext(),
-                    R.layout.fragment_info_list_item, mInfoListItems);
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
 
-            if (mInfoListView != null) {
-                mInfoListView.setAdapter(mInfoListViewAdapter);
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    // Retrieve Google search results HTML document to be parsed
+                    Document doc = Jsoup.connect(this.mGoogleSearchURL).get();
+
+                    // Parse out the search result links to populate info ListView
+                    this.mSearchResultLinks = doc.select("h3.r > a");
+                    this.mNumSearchResultLinks = this.mSearchResultLinks.size();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                // Retrieve URL links and descriptions of Google search results
+                // Add an infoListItem for each text/URL combo
+                for (int i = 0; i < this.mNumSearchResultLinks; i++) {
+                    Element searchResultLink = this.mSearchResultLinks.get(i);
+                    String linkURL = searchResultLink.attr("href");
+                    String linkText = searchResultLink.text();
+
+                    InfoListItem infoListItem = new InfoListItem(linkText, linkURL, "");
+                    mInfoListItems.add(infoListItem);
+                }
+
+                // Keep track of the number of search queries finished
+                synchronized(this) {
+                    mNumSearchQueriesFinished++;
+
+                    // After all search queries finished, set adapter with new mInfoListItems
+                    if (mNumSearchQueriesFinished == mNumSearchQueries) {
+                        mInfoListViewAdapter = new InfoListViewAdapter(getActivity().getApplicationContext(),
+                                R.layout.fragment_info_list_item, mInfoListItems);
+
+                        if (mInfoListView != null) {
+                            mInfoListView.setAdapter(mInfoListViewAdapter);
+                        }
+                    }
+                }
             }
         }
     }
