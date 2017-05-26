@@ -50,6 +50,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private LocationHelper mLocationHelper;
 
+    private InfoListViewFragment infoListViewFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,10 +65,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
             this.mLocationHelper = new LocationHelper(this, getLocationListener());
 
+            this.infoListViewFragment = new InfoListViewFragment();
+
             // Load InfoListViewFragment
             // TODO: pass in Google Places into the InfoListView
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.infoListViewFragment, new InfoListViewFragment())
+                    .add(R.id.infoListViewFragment, infoListViewFragment)
                     .commit();
         }
     }
@@ -242,6 +246,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     //Example of json response
                     //https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=34.0750228,-118.4418203&radius=75&key=AIzaSyDCtM8cDa6Gj_I0jUG4dh8fihRRqmi0jHo
                 }
+
+                infoListViewFragment.updateInfoListView(locationSearchURLs);
             } catch (JSONException ex) {
                 Log.e(TAG, "\nERROR in doInBackground - JSONException: " + ex.toString());
                 System.exit(1);

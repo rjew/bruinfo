@@ -64,7 +64,7 @@ public class InfoListViewFragment extends Fragment {
         return mainView;
     }
 
-    public void updateInfoListView(ArrayList<String> googleSearchURLs) {
+    public void updateInfoListView(List<String> googleSearchURLs) {
         new ParseGoogleSearches(googleSearchURLs);
     }
 
@@ -72,7 +72,7 @@ public class InfoListViewFragment extends Fragment {
         private int mNumSearchQueries;
         private int mNumSearchQueriesFinished;
 
-        public ParseGoogleSearches(ArrayList<String> googleSearchURLs) {
+        public ParseGoogleSearches(List<String> googleSearchURLs) {
             this.mNumSearchQueries = googleSearchURLs.size();
             this.mNumSearchQueriesFinished = 0;
 
