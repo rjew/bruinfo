@@ -39,7 +39,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity, FragmentActivity implements OnMapReadyCallback {
+public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
     public static final String TAG = MainActivity.class.getName();
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2017;
     private static final int REQUEST_APP_SETTINGS = 168;
