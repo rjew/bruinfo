@@ -38,5 +38,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:10.2.4'
     compile 'com.google.android.gms:play-services-location:10.2.4'
     compile 'org.jsoup:jsoup:1.10.2'
+    compile 'com.squareup.picasso:picasso:2.5.2'
     testCompile 'junit:junit:4.12'
 }

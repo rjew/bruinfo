@@ -4,12 +4,17 @@ import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
@@ -66,10 +71,42 @@ public class InfoListViewAdapter extends ArrayAdapter<InfoListItem> {
         infoListItemHolder.mLinkTextView.setText(infoListItemData.mLinkText);
         infoListItemHolder.mLinkURLView.setText(infoListItemData.mLinkURL);
 
-        if (infoListItemData.mLinkImage != "") {
+        final ImageView imageView = infoListItemHolder.mLinkImageView;
+        Picasso.with(mContext)
+                .load("https://java.sogeti.nl/JavaBlog/wp-content/uploads/2009/04/android_icon_256.png")
+                .placeholder(R.drawable.ic_sync_black_24dp)
+                .error(R.drawable.ic_sync_problem_black_24dp)
+                .networkPolicy(NetworkPolicy.OFFLINE)
+                .into(imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError() {
+                        //Try again online if cache failed
+                        Picasso.with(mContext)
+                                .load("https://java.sogeti.nl/JavaBlog/wp-content/uploads/2009/04/android_icon_256.png")
+                                .error(R.drawable.ic_sync_problem_black_24dp)
+                                .into(imageView, new Callback() {
+                                    @Override
+                                    public void onSuccess() {
+
+                                    }
+
+                                    @Override
+                                    public void onError() {
+                                        Log.v("Picasso","Could not fetch image");
+                                    }
+                                });
+                    }
+                });
+
+/*        if (infoListItemData.mLinkImage != "") {
             int resId = mContext.getResources().getIdentifier(infoListItemData.mLinkImage, "mipmap", mContext.getPackageName());
             infoListItemHolder.mLinkImageView.setImageResource(resId);
-        }
+        }*/
 
         return infoListItem;
     }
