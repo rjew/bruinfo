@@ -143,8 +143,14 @@ public class InfoListViewFragment extends Fragment {
 
                     // After all search queries finished, set adapter with new mInfoListItems
                     if (mNumSearchQueriesFinished == mNumSearchQueries) {
-                        mInfoListViewAdapter = new InfoListViewAdapter(getActivity().getApplicationContext(),
-                                R.layout.fragment_info_list_item, mInfoListItems);
+                        if (mInfoListViewAdapter == null) {
+                            mInfoListViewAdapter = new InfoListViewAdapter(getActivity().getApplicationContext(),
+                                    R.layout.fragment_info_list_item, mInfoListItems);
+                        } else {
+                            mInfoListViewAdapter.clear();
+                            mInfoListViewAdapter.addAll(mInfoListItems);
+                            mInfoListViewAdapter.notifyDataSetChanged();
+                        }
 
                         if (mInfoListView != null) {
                             mInfoListView.setAdapter(mInfoListViewAdapter);
