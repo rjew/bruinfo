@@ -3,7 +3,9 @@ package edu.ucla.bruinfo;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 public class InfoWebViewActivity extends AppCompatActivity {
 
@@ -23,5 +25,13 @@ public class InfoWebViewActivity extends AppCompatActivity {
 
         // Load the retrieved link URL in the infoWebView
         mWebView.loadUrl(linkURL);
+
+        mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                view.loadUrl(request.getUrl().toString());
+                return true;
+            }
+        });
     }
 }
