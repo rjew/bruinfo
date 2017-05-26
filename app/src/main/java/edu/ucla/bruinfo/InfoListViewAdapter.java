@@ -73,7 +73,7 @@ public class InfoListViewAdapter extends ArrayAdapter<InfoListItem> {
 
         final ImageView imageView = infoListItemHolder.mLinkImageView;
         Picasso.with(mContext)
-                .load("https://java.sogeti.nl/JavaBlog/wp-content/uploads/2009/04/android_icon_256.png")
+                .load(mInfoListItems.get(0).mLinkImage)
                 .placeholder(R.drawable.ic_sync_black_24dp)
                 .error(R.drawable.ic_sync_problem_black_24dp)
                 .networkPolicy(NetworkPolicy.OFFLINE)
@@ -87,7 +87,7 @@ public class InfoListViewAdapter extends ArrayAdapter<InfoListItem> {
                     public void onError() {
                         //Try again online if cache failed
                         Picasso.with(mContext)
-                                .load("https://java.sogeti.nl/JavaBlog/wp-content/uploads/2009/04/android_icon_256.png")
+                                .load(mInfoListItems.get(0).mLinkImage)
                                 .error(R.drawable.ic_sync_problem_black_24dp)
                                 .into(imageView, new Callback() {
                                     @Override

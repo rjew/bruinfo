@@ -59,20 +59,20 @@ public class InfoListViewFragment extends Fragment {
         ArrayList<String> googleSearchURLs = new ArrayList<String>();
         googleSearchURLs.add("https://www.google.com/search?q=Royce+Hall");
         googleSearchURLs.add("https://www.google.com/search?q=Powell+Libary");
-        updateInfoListView(googleSearchURLs);
+        //updateInfoListView(googleSearchURLs);
 
         return mainView;
     }
 
-    public void updateInfoListView(List<String> googleSearchURLs) {
-        new ParseGoogleSearches(googleSearchURLs);
+    public void updateInfoListView(List<String> googleSearchURLs, List<String> imageURLs) {
+        new ParseGoogleSearches(googleSearchURLs, imageURLs);
     }
 
     private class ParseGoogleSearches {
         private int mNumSearchQueries;
         private int mNumSearchQueriesFinished;
 
-        public ParseGoogleSearches(List<String> googleSearchURLs) {
+        public ParseGoogleSearches(List<String> googleSearchURLs, List<String> imageURLs) {
             this.mNumSearchQueries = googleSearchURLs.size();
             this.mNumSearchQueriesFinished = 0;
 
@@ -81,7 +81,8 @@ public class InfoListViewFragment extends Fragment {
 
             for (int i = 0; i < this.mNumSearchQueries; i++) {
                 String googleSearchURL = googleSearchURLs.get(i);
-                new ParseGoogleSearch(googleSearchURL).execute();
+                String imageURL = imageURLs.get(i);
+                new ParseGoogleSearch(googleSearchURL, imageURL).execute();
             }
         }
 
@@ -89,12 +90,13 @@ public class InfoListViewFragment extends Fragment {
         // given a Google search URL
         private class ParseGoogleSearch extends AsyncTask<Void, Void, Void> {
             private String mGoogleSearchURL;
+            private String mImageURL;
             private Elements mSearchResultLinks;
             private int mNumSearchResultLinks;
 
-
-            public ParseGoogleSearch(String googleSearchURL) {
+            public ParseGoogleSearch(String googleSearchURL, String imageURL) {
                 this.mGoogleSearchURL = googleSearchURL;
+                this.mImageURL = imageURL;
                 this.mNumSearchResultLinks = 0;
                 this.mSearchResultLinks = null;
             }
@@ -133,7 +135,7 @@ public class InfoListViewFragment extends Fragment {
                     String linkURL = searchResultLink.attr("href");
                     String linkText = searchResultLink.text();
 
-                    InfoListItem infoListItem = new InfoListItem(linkText, linkURL, "");
+                    InfoListItem infoListItem = new InfoListItem(linkText, linkURL, mImageURL);
                     mInfoListItems.add(infoListItem);
                 }
 

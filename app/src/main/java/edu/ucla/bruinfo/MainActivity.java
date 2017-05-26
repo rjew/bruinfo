@@ -205,6 +205,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         protected Void doInBackground(Void... arg0) {
             JSONObject json = readJsonFromUrl(generateNearbySearchURL(this.location));
             List<String> locationSearchURLs = new ArrayList<>();
+            List<String> imageURLs = new ArrayList<>();
 
             try {
                 JSONArray locationResults = json.getJSONArray("results");
@@ -221,6 +222,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     JSONArray photosJSONArray = locationResults.getJSONObject(i).optJSONArray("photos");
                     String photoReference = (photosJSONArray == null) ? "" : photosJSONArray.getJSONObject(0).getString("photo_reference");
                     String imageURL = (photoReference.isEmpty()) ? locationResults.getJSONObject(i).getString("icon") : generatePhotoURL(photoReference);
+                    imageURLs.add(imageURL);
 
                     JSONObject location = locationResults.getJSONObject(i).getJSONObject("geometry").getJSONObject("location");
                     final double latitude = location.getDouble("lat");
@@ -247,7 +249,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     //https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=34.0750228,-118.4418203&radius=75&key=AIzaSyDCtM8cDa6Gj_I0jUG4dh8fihRRqmi0jHo
                 }
 
-                infoListViewFragment.updateInfoListView(locationSearchURLs);
+                infoListViewFragment.updateInfoListView(locationSearchURLs, imageURLs);
             } catch (JSONException ex) {
                 Log.e(TAG, "\nERROR in doInBackground - JSONException: " + ex.toString());
                 System.exit(1);
