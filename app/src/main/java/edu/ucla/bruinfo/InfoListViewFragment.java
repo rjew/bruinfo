@@ -135,7 +135,7 @@ public class InfoListViewFragment extends Fragment {
                     String linkURL = searchResultLink.attr("href");
                     String linkText = searchResultLink.text();
 
-                    InfoListItem infoListItem = new InfoListItem(linkText, linkURL, mImageURL);
+                    InfoListItem infoListItem = new InfoListItem(linkText, linkURL, this.mImageURL);
                     mInfoListItems.add(infoListItem);
                 }
 
@@ -145,14 +145,20 @@ public class InfoListViewFragment extends Fragment {
 
                     // After all search queries finished, set adapter with new mInfoListItems
                     if (mNumSearchQueriesFinished == mNumSearchQueries) {
-                        if (mInfoListViewAdapter == null) {
-                            mInfoListViewAdapter = new InfoListViewAdapter(getActivity().getApplicationContext(),
-                                    R.layout.fragment_info_list_item, mInfoListItems);
-                        } else {
+                        //if (mInfoListViewAdapter == null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                                          @Override
+                                          public void run() {
+                                              mInfoListViewAdapter = new InfoListViewAdapter(getActivity().getApplicationContext(),
+                                                      R.layout.fragment_info_list_item, mInfoListItems);
+                                              mInfoListViewAdapter.notifyDataSetChanged();
+                                          }
+                                      });
+/*                        } else {
                             mInfoListViewAdapter.clear();
                             mInfoListViewAdapter.addAll(mInfoListItems);
                             mInfoListViewAdapter.notifyDataSetChanged();
-                        }
+                        }*/
 
                         if (mInfoListView != null) {
                             mInfoListView.setAdapter(mInfoListViewAdapter);

@@ -1,6 +1,10 @@
 package edu.ucla.bruinfo;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +19,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Transformation;
 
 import org.w3c.dom.Text;
 
@@ -43,7 +48,7 @@ public class InfoListViewAdapter extends ArrayAdapter<InfoListItem> {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         View infoListItem = convertView;
         InfoListItemHolder infoListItemHolder = null;
 
@@ -73,10 +78,12 @@ public class InfoListViewAdapter extends ArrayAdapter<InfoListItem> {
 
         final ImageView imageView = infoListItemHolder.mLinkImageView;
         Picasso.with(mContext)
-                .load(mInfoListItems.get(0).mLinkImage)
+                .load(mInfoListItems.get(position).mLinkImage)
                 .placeholder(R.drawable.ic_sync_black_24dp)
                 .error(R.drawable.ic_sync_problem_black_24dp)
                 .networkPolicy(NetworkPolicy.OFFLINE)
+                //.transform(new CircleTransform())
+                //.resize(10, 10)
                 .into(imageView, new Callback() {
                     @Override
                     public void onSuccess() {
@@ -87,7 +94,7 @@ public class InfoListViewAdapter extends ArrayAdapter<InfoListItem> {
                     public void onError() {
                         //Try again online if cache failed
                         Picasso.with(mContext)
-                                .load(mInfoListItems.get(0).mLinkImage)
+                                .load(mInfoListItems.get(position).mLinkImage)
                                 .error(R.drawable.ic_sync_problem_black_24dp)
                                 .into(imageView, new Callback() {
                                     @Override
@@ -115,6 +122,40 @@ public class InfoListViewAdapter extends ArrayAdapter<InfoListItem> {
         TextView mLinkTextView;
         TextView mLinkURLView;
         ImageView mLinkImageView;
+    }
+
+    private class CircleTransform implements Transformation {
+        @Override
+        public Bitmap transform(Bitmap source) {
+            int size = Math.min(source.getWidth(), source.getHeight());
+
+            int x = (source.getWidth() - size) / 2;
+            int y = (source.getHeight() - size) / 2;
+
+            Bitmap squaredBitmap = Bitmap.createBitmap(source, x, y, size, size);
+            if (squaredBitmap != source) {
+                source.recycle();
+            }
+
+            Bitmap bitmap = Bitmap.createBitmap(size, size, source.getConfig());
+
+            Canvas canvas = new Canvas(bitmap);
+            Paint paint = new Paint();
+            BitmapShader shader = new BitmapShader(squaredBitmap, BitmapShader.TileMode.CLAMP, BitmapShader.TileMode.CLAMP);
+            paint.setShader(shader);
+            paint.setAntiAlias(true);
+
+            float r = size/2f;
+            canvas.drawCircle(r, r, r, paint);
+
+            squaredBitmap.recycle();
+            return bitmap;
+        }
+
+        @Override
+        public String key() {
+            return "circle";
+        }
     }
 }
 
