@@ -52,6 +52,9 @@ public class InfoListViewAdapter extends ArrayAdapter<InfoListItem> {
         View infoListItem = convertView;
         InfoListItemHolder infoListItemHolder = null;
 
+        System.out.println("In getView");
+        System.out.println("mInfoListItems.size: " + mInfoListItems.size());
+
         // If we currently do not have an infoListItem View to reuse,
         // create a new infoListItem View
         if (infoListItem == null) {
@@ -82,8 +85,7 @@ public class InfoListViewAdapter extends ArrayAdapter<InfoListItem> {
                 .placeholder(R.drawable.ic_sync_black_24dp)
                 .error(R.drawable.ic_sync_problem_black_24dp)
                 .networkPolicy(NetworkPolicy.OFFLINE)
-                //.transform(new CircleTransform())
-                //.resize(10, 10)
+                .fit()
                 .into(imageView, new Callback() {
                     @Override
                     public void onSuccess() {
@@ -110,11 +112,6 @@ public class InfoListViewAdapter extends ArrayAdapter<InfoListItem> {
                     }
                 });
 
-/*        if (infoListItemData.mLinkImage != "") {
-            int resId = mContext.getResources().getIdentifier(infoListItemData.mLinkImage, "mipmap", mContext.getPackageName());
-            infoListItemHolder.mLinkImageView.setImageResource(resId);
-        }*/
-
         return infoListItem;
     }
 
@@ -122,40 +119,6 @@ public class InfoListViewAdapter extends ArrayAdapter<InfoListItem> {
         TextView mLinkTextView;
         TextView mLinkURLView;
         ImageView mLinkImageView;
-    }
-
-    private class CircleTransform implements Transformation {
-        @Override
-        public Bitmap transform(Bitmap source) {
-            int size = Math.min(source.getWidth(), source.getHeight());
-
-            int x = (source.getWidth() - size) / 2;
-            int y = (source.getHeight() - size) / 2;
-
-            Bitmap squaredBitmap = Bitmap.createBitmap(source, x, y, size, size);
-            if (squaredBitmap != source) {
-                source.recycle();
-            }
-
-            Bitmap bitmap = Bitmap.createBitmap(size, size, source.getConfig());
-
-            Canvas canvas = new Canvas(bitmap);
-            Paint paint = new Paint();
-            BitmapShader shader = new BitmapShader(squaredBitmap, BitmapShader.TileMode.CLAMP, BitmapShader.TileMode.CLAMP);
-            paint.setShader(shader);
-            paint.setAntiAlias(true);
-
-            float r = size/2f;
-            canvas.drawCircle(r, r, r, paint);
-
-            squaredBitmap.recycle();
-            return bitmap;
-        }
-
-        @Override
-        public String key() {
-            return "circle";
-        }
     }
 }
 

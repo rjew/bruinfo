@@ -248,7 +248,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     //Example of json response
                     //https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=34.0750228,-118.4418203&radius=75&key=AIzaSyDCtM8cDa6Gj_I0jUG4dh8fihRRqmi0jHo
                 }
-
+                System.out.println("Updating infoListViewFragment");
                 infoListViewFragment.updateInfoListView(locationSearchURLs, imageURLs);
             } catch (JSONException ex) {
                 Log.e(TAG, "\nERROR in doInBackground - JSONException: " + ex.toString());

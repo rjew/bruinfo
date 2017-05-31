@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by Alfred Lucero on 5/25/2017.
@@ -56,11 +60,6 @@ public class InfoListViewFragment extends Fragment {
             }
         });
 
-        ArrayList<String> googleSearchURLs = new ArrayList<String>();
-        googleSearchURLs.add("https://www.google.com/search?q=Royce+Hall");
-        googleSearchURLs.add("https://www.google.com/search?q=Powell+Libary");
-        //updateInfoListView(googleSearchURLs);
-
         return mainView;
     }
 
@@ -71,13 +70,20 @@ public class InfoListViewFragment extends Fragment {
     private class ParseGoogleSearches {
         private int mNumSearchQueries;
         private int mNumSearchQueriesFinished;
+        private final Semaphore lock = new Semaphore(1);
 
         public ParseGoogleSearches(List<String> googleSearchURLs, List<String> imageURLs) {
             this.mNumSearchQueries = googleSearchURLs.size();
             this.mNumSearchQueriesFinished = 0;
 
-            // Clear the old InfoListItems
-            mInfoListItems.clear();
+            //
+            try {
+                lock.acquire();
+            } catch(InterruptedException e) {
+                Log.e("Exception", e.toString());
+            }
+
+            mInfoListItems = new ArrayList<InfoListItem>();
 
             for (int i = 0; i < this.mNumSearchQueries; i++) {
                 String googleSearchURL = googleSearchURLs.get(i);
@@ -130,12 +136,12 @@ public class InfoListViewFragment extends Fragment {
             protected void onPostExecute(Void result) {
                 // Retrieve URL links and descriptions of Google search results
                 // Add an infoListItem for each text/URL combo
-                for (int i = 0; i < this.mNumSearchResultLinks; i++) {
-                    Element searchResultLink = this.mSearchResultLinks.get(i);
+                for (int i = 0; i < mNumSearchResultLinks; i++) {
+                    Element searchResultLink = mSearchResultLinks.get(i);
                     String linkURL = searchResultLink.attr("href");
                     String linkText = searchResultLink.text();
 
-                    InfoListItem infoListItem = new InfoListItem(linkText, linkURL, this.mImageURL);
+                    InfoListItem infoListItem = new InfoListItem(linkText, linkURL, mImageURL);
                     mInfoListItems.add(infoListItem);
                 }
 
@@ -151,18 +157,12 @@ public class InfoListViewFragment extends Fragment {
                                           public void run() {
                                               mInfoListViewAdapter = new InfoListViewAdapter(getActivity().getApplicationContext(),
                                                       R.layout.fragment_info_list_item, mInfoListItems);
-                                              mInfoListViewAdapter.notifyDataSetChanged();
+
+                                              mInfoListView.setAdapter(mInfoListViewAdapter);
+                                              lock.release();
                                           }
                                       });
-/*                        } else {
-                            mInfoListViewAdapter.clear();
-                            mInfoListViewAdapter.addAll(mInfoListItems);
-                            mInfoListViewAdapter.notifyDataSetChanged();
-                        }*/
 
-                        if (mInfoListView != null) {
-                            mInfoListView.setAdapter(mInfoListViewAdapter);
-                        }
                     }
                 }
             }
