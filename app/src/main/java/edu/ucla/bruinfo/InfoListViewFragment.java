@@ -3,6 +3,7 @@ package edu.ucla.bruinfo;
 
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -30,10 +31,12 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 
 public class InfoListViewFragment extends Fragment {
+    public static final String TAG = InfoListViewFragment.class.getName();
     private ListView mInfoListView;
     private InfoListViewAdapter mInfoListViewAdapter;
     private List<InfoListItem> mInfoListItems;
-
+    private List<InfoListItem> mInfoListItemsTemp;
+    private final Semaphore lock = new Semaphore(1);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,7 +73,6 @@ public class InfoListViewFragment extends Fragment {
     private class ParseGoogleSearches {
         private int mNumSearchQueries;
         private int mNumSearchQueriesFinished;
-        private final Semaphore lock = new Semaphore(1);
 
         public ParseGoogleSearches(List<String> googleSearchURLs, List<String> imageURLs) {
             this.mNumSearchQueries = googleSearchURLs.size();
@@ -83,12 +85,19 @@ public class InfoListViewFragment extends Fragment {
                 Log.e("Exception", e.toString());
             }
 
-            mInfoListItems = new ArrayList<InfoListItem>();
+            Log.i(TAG, "After acquire lock");
+
+            mInfoListItemsTemp = new ArrayList<InfoListItem>();
 
             for (int i = 0; i < this.mNumSearchQueries; i++) {
                 String googleSearchURL = googleSearchURLs.get(i);
                 String imageURL = imageURLs.get(i);
-                new ParseGoogleSearch(googleSearchURL, imageURL).execute();
+                //new ParseGoogleSearch(googleSearchURL, imageURL).execute();
+                if(Build.VERSION.SDK_INT >= 11/*HONEYCOMB*/) {
+                    new ParseGoogleSearch(googleSearchURL, imageURL).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                } else {
+                    new ParseGoogleSearch(googleSearchURL, imageURL).execute();
+                }
             }
         }
 
@@ -142,7 +151,7 @@ public class InfoListViewFragment extends Fragment {
                     String linkText = searchResultLink.text();
 
                     InfoListItem infoListItem = new InfoListItem(linkText, linkURL, mImageURL);
-                    mInfoListItems.add(infoListItem);
+                    mInfoListItemsTemp.add(infoListItem);
                 }
 
                 // Keep track of the number of search queries finished
@@ -152,13 +161,21 @@ public class InfoListViewFragment extends Fragment {
                     // After all search queries finished, set adapter with new mInfoListItems
                     if (mNumSearchQueriesFinished == mNumSearchQueries) {
                         //if (mInfoListViewAdapter == null) {
+
+                        if(getActivity() == null)
+                            return;
+
                         getActivity().runOnUiThread(new Runnable() {
                                           @Override
                                           public void run() {
+                                              mInfoListItems = mInfoListItemsTemp;
+
                                               mInfoListViewAdapter = new InfoListViewAdapter(getActivity().getApplicationContext(),
                                                       R.layout.fragment_info_list_item, mInfoListItems);
 
                                               mInfoListView.setAdapter(mInfoListViewAdapter);
+
+                                              Log.i(TAG, "Release lock");
                                               lock.release();
                                           }
                                       });
